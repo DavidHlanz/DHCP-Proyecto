@@ -49,14 +49,14 @@ Antes de iniciar el proyecto asegúrate de tener instalado:
 
    Esto creará:
    - `servidor` → Servidor DHCP configurado automáticamente  
-   - `cliente1` y `cliente2` → Clientes que obtienen IP mediante DHCP  
+   - `c2` y `c2` → Clientes que obtienen IP mediante DHCP  
 
 3. **Verificar la configuración:**
 
    Conéctate a un cliente y ejecuta:
 
    ```bash
-   vagrant ssh cliente1
+   vagrant ssh c1
    ip a
    ```
 
