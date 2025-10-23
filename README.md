@@ -1,114 +1,119 @@
-# Proyecto DHCP con Vagrant
-
-Este proyecto implementa un **servidor DHCP** y **dos clientes** utilizando **Vagrant** y un script de **provisionamiento automático** en **Bash**.  
-El objetivo es simular una red local donde el servidor asigna direcciones IP dinámicas a los clientes mediante DHCP.
+# 🧩 DHCP and Vagrant Project  
+**Authors:** David Ortiz & Javier Padial  
+📦 [GitHub Repository](https://github.com/DavidHlanz/DHCP-Proyecto)
 
 ---
 
-## 🧱 Estructura del proyecto
+## 🧰 Requirements
 
+### 1. VirtualBox  
+Vagrant uses VirtualBox as its default hypervisor.
+
+### 2. Vagrant  
+Used to create and manage virtualized development environments.
+
+### 3. Git (optional)  
+You can download the project using Git or as a compressed ZIP file.
+
+---
+
+## ⚙️ Tutorial to Use
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/DavidHlanz/DHCP-Proyecto.git
 ```
-.
-├── Vagrantfile
-├── provision_servidor.sh
-├── .gitignore
-└── vendor/
+
+### 2. Open the project folder
+```bash
+cd ~/Documentos/DHCP-Proyecto
 ```
 
-- **Vagrantfile** → Define las 3 máquinas virtuales (1 servidor y 2 clientes) y su red interna.  
-- **provision_servidor.sh** → Instala y configura automáticamente el servicio DHCP en el servidor.  
-- **vendor/** → Carpeta auxiliar (si la usas para dependencias o scripts).  
-- **.gitignore** → Archivos ignorados por Git.
+### 3. Create a host-only network on 192.168.57.1/24  
+- Open **VirtualBox → Preferences → Network → Host-only Networks**
+- Create a new network with the following settings:
+  - **IPv4:** `192.168.57.1`
+  - **Subnet mask:** `255.255.255.0`
+  - **DHCP server:** Disabled
+
+### 4. Raise the machines
+```bash
+vagrant up
+```
+> Vagrant will download the box (this may take a while the first time), create the VMs, and apply your network configuration and provisioning automatically.  
+> If it does not, use:
+```bash
+vagrant provision server
+```
 
 ---
 
-## ⚙️ Requisitos previos
+## ⚒️ Test Commands
 
-Antes de iniciar el proyecto asegúrate de tener instalado:
-
-- [Vagrant](https://developer.hashicorp.com/vagrant/downloads)
-- [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
-- Conexión a internet para descargar las imágenes base
-
----
-
-## 🚀 Puesta en marcha
-
-1. **Clonar el repositorio:**
-
-   ```bash
-   git clone https://github.com/DavidHlanz/DHCP-Proyecto.git
-   cd DHCP-Proyecto
-   ```
-
-2. **Levantar las máquinas virtuales:**
-
-   ```bash
-   vagrant up
-   ```
-
-   Esto creará:
-   - `servidor` → Servidor DHCP configurado automáticamente  
-   - `c2` y `c2` → Clientes que obtienen IP mediante DHCP  
-
-3. **Verificar la configuración:**
-
-   Conéctate a un cliente y ejecuta:
-
-   ```bash
-   vagrant ssh c1
-   ip a
-   ```
-
-   Verás una dirección IP obtenida del rango definido en el servidor DHCP.
+| Action | Command |
+|--------|----------|
+| See machine status | `vagrant status` |
+| Access the server machine | `vagrant ssh servidor` |
+| Access client machines | `vagrant ssh c1` / `vagrant ssh c2` |
+| Reload the server | `vagrant reload servidor` |
+| Test the network | `ping 192.168.57.10`<br>`ip -a`<br>`cat /etc/resolv.conf` |
+| Stop all machines | `vagrant halt` |
+| Destroy all machines | `vagrant destroy -f` |
 
 ---
 
-## 🧩 Configuración DHCP
+## ⚙️ Configuration
 
-El archivo `provision_servidor.sh` realiza:
-
-- Instalación del paquete DHCP (`isc-dhcp-server`)
-- Configuración de `/etc/dhcp/dhcpd.conf` con:
-  - Rango de IPs
-  - Máscara de red
-  - Puerta de enlace
-  - Servidor DNS
-- Activación y reinicio del servicio DHCP
-
-Puedes modificar el rango o parámetros dentro del script según tus necesidades.
+### Exercise requirements
+- **Three machines:**
+  - `servidor` → DHCP server  
+  - `c1` → Client requesting dynamic IP  
+  - `c2` → Client that must always receive a fixed IP according to its MAC  
+- **Internal network:** `192.168.57.0/24`
+- **Server IP:** `192.168.57.10`
+- **DHCP Range:** `192.168.57.25 - 192.168.57.50`
+- **Fixed IP:** `c2` must always receive `192.168.57.4`
 
 ---
 
-## 🔁 Comandos útiles
-
-- **Reiniciar el entorno:**
-  ```bash
-  vagrant reload
-  ```
-
-- **Reprovisionar (si cambiaste el script):**
-  ```bash
-  vagrant provision servidor
-  ```
-
-- **Eliminar todas las máquinas:**
-  ```bash
-  vagrant destroy -f
-  ```
+### 1. Vagrantfile Configuration  
+Contains the definitions of the server and the two clients.  
+Once configured, start them with:
+```bash
+vagrant up servidor
+vagrant up c1
+vagrant up c2
+```
 
 ---
 
-## 🧠 Conceptos prácticos que se pueden probar
-
-- Capturar paquetes DHCP con Wireshark.
-- Probar conflictos de IP.
-- Añadir un segundo servidor DHCP y probar tolerancia.
-- Configurar reservas IP para MACs específicas.
+### 2. Locate the Interface  
+```bash
+ip -a
+nano /etc/default/isc-dhcpd-server
+```
 
 ---
 
-## 📜 Licencia
+### 3. dhcpd.conf Configuration  
+Define the DHCP server behavior, IP ranges, and MAC-based assignments.
 
-Proyecto educativo sin licencia específica.  
-Puedes reutilizarlo y adaptarlo libremente con fines académicos o de práctica.
+---
+
+### 4. Test IP Clients  
+Verify that each client receives the correct IP address.
+
+---
+
+### 5. Review Logs  
+Check system and DHCP logs to ensure the service is working properly.
+
+---
+
+### 6. View Leases  
+Inspect the lease file to confirm IP assignments.
+
+---
+
+📘 **Authors:**  
+David Ortiz Sierra & Javier Padial  
